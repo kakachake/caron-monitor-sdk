@@ -1,2 +1,3 @@
-console.log("hello world");
-export default 1;
+import WebMonitor from "./core";
+
+export default WebMonitor;
