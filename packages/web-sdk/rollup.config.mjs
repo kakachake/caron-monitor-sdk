@@ -1,4 +1,4 @@
-import typescript from "rollup-plugin-typescript2";
+import typescript from "@rollup/plugin-typescript";
 import terser from "@rollup/plugin-terser";
 import babel from "@rollup/plugin-babel";
 import npm from "@rollup/plugin-node-resolve";
@@ -17,14 +17,13 @@ export default {
       file: "dist/index.js",
       format: "umd",
       name: "CaronMonitor",
+      sourcemap: true,
     },
   ],
   plugins: [
     npm(),
     commonjs(),
-    typescript({
-      tsconfig: "tsconfig.json",
-    }),
+    typescript({}),
     babel({
       babelHelpers: "bundled",
       exclude: "node_modules/**",

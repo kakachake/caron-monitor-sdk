@@ -4,6 +4,11 @@ import { defalutPlugins } from "src/plugins/";
 import { SyncHook } from "src/tapable";
 import DefalutSender from "src/sender/defaultSender";
 import Sender from "src/sender/sender";
+import ImgSender from "src/sender/imgSender";
+
+const defalutOptions: Partial<Options> = {
+  senderType: "xhr",
+};
 
 class WebMonitor {
   options: Options;
@@ -12,7 +17,7 @@ class WebMonitor {
   sendInstance?: Sender;
 
   constructor(options: Options) {
-    this.options = options;
+    this.options = { ...defalutOptions, ...options };
     this.hooks = {
       beforeLog: new SyncHook(),
     };
@@ -21,7 +26,12 @@ class WebMonitor {
   }
 
   initSender() {
-    this.sendInstance = new DefalutSender(this.options);
+    if (this.options.senderType === "xhr") {
+      this.sendInstance = new DefalutSender(this.options);
+      return;
+    } else if (this.options.senderType === "img") {
+      this.sendInstance = new ImgSender(this.options);
+    }
   }
 
   initPlugins() {
@@ -45,7 +55,16 @@ class WebMonitor {
 
   collectLog(log: Log) {
     this.hooks.beforeLog.call(log);
+    this.parseLog(log);
     this.sendInstance?.send(log);
+  }
+
+  parseLog(log: Log) {
+    Object.keys(log).forEach((key) => {
+      if (typeof log[key as keyof Log] === "object") {
+        (log as any)[key] = JSON.stringify(log[key as keyof Log]);
+      }
+    });
   }
 }
 

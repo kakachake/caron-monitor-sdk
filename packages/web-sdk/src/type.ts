@@ -5,6 +5,7 @@ export interface Options {
   projectName: string;
   appid: string;
   url: string;
+  senderType: "img" | "xhr";
 }
 
 export interface Log {
@@ -29,9 +30,17 @@ export interface Log {
   // 错误发生的行列
   position: string;
   // 错误堆栈
-  stack: string;
+  stack: {
+    // 错误发生的函数
+    func?: string;
+    // 错误发生的文件
+    filename?: string;
+    // 错误发生的行列
+    line?: string;
+    column?: string;
+  }[];
   // 错误发生的时间
-  timestamp: number;
+  timestamp: string;
   // 错误发生的页面
   url?: string;
   // 错误发生的页面标题
