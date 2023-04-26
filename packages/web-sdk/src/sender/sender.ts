@@ -1,19 +1,13 @@
 import { Log, SenderOptions } from "src/type";
-const host = "http://caron-monitor.cn-beijing.log.aliyuncs.com";
-const logstoreName = "caron_store";
 
 export default abstract class Sender {
-  options: SenderOptions & {
-    host: string;
-    logstoreName: string;
-  };
-  url = `${host}/logstores/${logstoreName}/track`;
+  options: SenderOptions;
+  url: string;
   constructor(options: SenderOptions) {
     this.options = {
       ...options,
-      host,
-      logstoreName,
     };
+    this.url = `${this.options.host}/logstores/${this.options.logstoreName}/track`;
   }
 
   abstract send(log: Log): any;

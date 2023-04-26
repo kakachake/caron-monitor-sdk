@@ -1,13 +1,14 @@
 import MonitorPlugin from "src/plugins/plugin";
-import { Hooks, Log, Options } from "src/type";
+import { ExcludeShareLog, Hooks, Log, Options } from "src/type";
 import { defalutPlugins } from "src/plugins/";
 import { SyncHook } from "src/tapable";
-import DefalutSender from "src/sender/defaultSender";
 import Sender from "src/sender/sender";
-import ImgSender from "src/sender/imgSender";
+import onload from "src/utils/onload";
+import getSender from "src/sender";
 
 const defalutOptions: Partial<Options> = {
   senderType: "xhr",
+  maxEmptyCount: 14,
 };
 
 class WebMonitor {
@@ -26,21 +27,20 @@ class WebMonitor {
   }
 
   initSender() {
-    if (this.options.senderType === "xhr") {
-      this.sendInstance = new DefalutSender(this.options);
-      return;
-    } else if (this.options.senderType === "img") {
-      this.sendInstance = new ImgSender(this.options);
-    }
+    this.sendInstance = getSender(this.options.senderType, this.options);
   }
 
   initPlugins() {
     const options = this.options;
-    console.log(defalutPlugins);
+    const { plugins = [] } = options;
 
     this.use(
       ...defalutPlugins.map((Plugin) => {
-        return new Plugin(options);
+        return new Plugin(options, this);
+      }),
+
+      ...plugins.map((Plugin) => {
+        return new Plugin(options, this);
       })
     );
   }
@@ -51,18 +51,45 @@ class WebMonitor {
 
   start() {
     this.plugins.forEach((plugin) => plugin.apply(this));
+    this.onLoad();
   }
 
-  collectLog(log: Log) {
+  onLoad() {
+    onload(() => {
+      this.plugins.forEach((plugin) => plugin.onload(this));
+    });
+  }
+
+  collectLog(
+    log: ExcludeShareLog,
+    options: {
+      senderType?: "xhr" | "img" | "beacon";
+    } = {}
+  ) {
+    const { senderType } = options;
     this.hooks.beforeLog.call(log);
     this.parseLog(log);
-    this.sendInstance?.send(log);
+
+    if (!senderType) {
+      this.sendInstance?.send(log as Log);
+    } else {
+      const instance = getSender(senderType, this.options);
+      instance?.send(log as Log);
+    }
   }
 
-  parseLog(log: Log) {
+  parseLog(log: any) {
     Object.keys(log).forEach((key) => {
-      if (typeof log[key as keyof Log] === "object") {
-        (log as any)[key] = JSON.stringify(log[key as keyof Log]);
+      switch (typeof log[key]) {
+        case "object":
+          log[key] = JSON.stringify(log[key as keyof Log]);
+          break;
+        case "number":
+          log[key] = log[key as keyof Log].toString();
+          break;
+        case "boolean":
+          log[key] = log[key as keyof Log].toString();
+          break;
       }
     });
   }

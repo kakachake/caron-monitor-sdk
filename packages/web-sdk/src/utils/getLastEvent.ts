@@ -1,5 +1,7 @@
-let lastEvent: Event | null = null;
+import getSelectors from "./getSelector";
 
+let lastEvent: Event | null = null;
+let lastEventSelectors = "";
 [
   "click",
   "dblclick",
@@ -13,6 +15,7 @@ let lastEvent: Event | null = null;
     eventName,
     (event) => {
       lastEvent = event;
+      lastEventSelectors = getSelectors(event.composedPath());
     },
     {
       capture: true,
@@ -21,4 +24,4 @@ let lastEvent: Event | null = null;
   );
 });
 
-export { lastEvent };
+export { lastEvent, lastEventSelectors };

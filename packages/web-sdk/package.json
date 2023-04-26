@@ -2,7 +2,9 @@
   "name": "web-sdk",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "module": "dist/esm/index.js",
+  "types": "dist/esm/index.d.ts",
   "scripts": {
     "dev": "rollup -c -w",
     "build": "rollup -c",

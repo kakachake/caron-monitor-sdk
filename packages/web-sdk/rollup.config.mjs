@@ -14,9 +14,14 @@ export default {
   input: "src/index.ts",
   output: [
     {
-      file: "dist/index.js",
+      file: "dist/umd/index.js",
       format: "umd",
       name: "CaronMonitor",
+      sourcemap: true,
+    },
+    {
+      file: "dist/esm/index.js",
+      format: "es",
       sourcemap: true,
     },
   ],

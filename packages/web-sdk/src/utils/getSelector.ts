@@ -1,9 +1,14 @@
 export default function getSelectors(path: EventTarget[]): string {
-  const selectors: string[] = [];
-
-  path = path.slice(0, path.length - 2);
+  if (!Array.isArray(path)) {
+    path = [path];
+  }
 
   path.reverse();
+
+  const selectors: string[] = [];
+  if (path.length > 2 && path[0] === window && path[1] === document) {
+    path = path.slice(3);
+  }
 
   for (let i = 0; i < path.length; i++) {
     const el = path[i] as HTMLElement;
@@ -15,7 +20,7 @@ export default function getSelectors(path: EventTarget[]): string {
       selector += `#${el.id}`;
       selectors.push(selector);
     } else {
-      const sib = el.parentNode?.querySelectorAll(selector);
+      const sib = Array.from(el.parentNode?.querySelectorAll(selector) || []);
       // if (el.className) {
       //   selector += `.${el.className}`;
       // }

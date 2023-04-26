@@ -18,9 +18,9 @@ export default class DefalutSender extends Sender {
     this.xhr.setRequestHeader("x-log-apiversion", "0.6.0");
     this.xhr.setRequestHeader("x-log-bodyrawsize", body.length.toString());
     this.xhr.onload = () => {
-      console.log(this.xhr.response);
+      // console.log(this.xhr.response);
     };
-    console.log(body);
+    // console.log(body);
 
     this.xhr.send(JSON.stringify(data));
   }

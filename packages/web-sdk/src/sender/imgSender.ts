@@ -8,9 +8,11 @@ export default class ImgSender extends Sender {
   }
 
   send(log: Log) {
+    // todo 传参有些问题
     const params = Object.entries(log)
       .map(([key, value]) => `${key}=${value}`)
       .join("&");
+
     const img = new Image();
     img.src = `${this.options.host}/logstores/${this.options.logstoreName}/track_ua.gif?APIVersion=0.6.0&${params}`;
   }
